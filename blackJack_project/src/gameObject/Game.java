@@ -11,20 +11,24 @@ public class Game {
 
 		// 게임 생성시 클래스 인스턴스 생성
 		Scanner sc = new Scanner(System.in);
-		System.out.println("----BlackJack----");
+		System.out.println("+---------BlackJack Game---------+\n");
+		System.out.println("블랙잭은 딜러와 플레이어중 카드의 합이 21 또는");
+		System.out.println("그에 준하는 숫자를 가지는 쪽이 이기는 게임입니다.\n");
 		GameRule rule = new GameRule();
 		CardDeck cardDeck = new CardDeck();
 
 		// 게임 플레이시
-		List<Player> players = Arrays.asList(new Gamer("User"), new Dealer());
+		List<Player> players = Arrays.asList(new Gamer("Gamer"), new Dealer());
 		List<Player> initAfterPlayers = initPhase(cardDeck, players);
 		List<Player> playingAfterPlayers = receiveCardAllPlayers(sc, cardDeck, initAfterPlayers);
 
 		Player winner = rule.getWinner(playingAfterPlayers);
+		System.out.println("===================================");
 		System.out.println("Winner : " + winner.getName());
+		System.out.println("===================================");
 	}
 
-	// hit이면 카드를 한장 뽑고 카드 연산하기
+	// Player면 hit시 카드를 한장 뽑고 카드 연산하기
 	private List<Player> receiveCardAllPlayers(Scanner sc, CardDeck cardDeck, List<Player> players) {
 		boolean playtrue[] = new boolean[2];
 
@@ -42,23 +46,46 @@ public class Game {
 				if (player instanceof Dealer) {
 					Card card = cardDeck.draw();
 					if (getScore(player.openCards()) > 17) {
+						System.out.println("카드의 총 합이 17이 넘습니다. 더이상 카드를 받을 수 없습니다.");
 						player.showCards();
 						break;
+					} else if (getScore(player.openCards()) < 17) {
+						System.out.println("카드의 총 합이 17이 넘지 않아 새로운 카드를 뽑습니다.\n");
+						player.receiveCard(card);
+						player.showCards();
+						player.turnOn();
+
+						if (getScore(player.openCards()) > 21) {
+							int score = getScore(player.openCards());
+							System.out.println("BUST!");
+							System.out.println(player.getName() + "님의 카드의 합은 " + score + "점으로 21점이 넘었습니다.\n");
+							return players;
+
+						} else if (getScore(player.openCards()) == 21) {
+							System.out.println("BLACK JACK!!!");
+							System.out.println("축하합니다. " + player.getName() + "님의 승리입니다.\n");
+							return players;
+						}
+						continue;
 					}
 				}
 
 				// hit면 카드를 한장 뽑기
-				if (isReceiveCard(sc)) {
+				if (player instanceof Gamer && isReceiveCard(sc)) {
 					Card card = cardDeck.draw();
 					player.receiveCard(card);
 					player.showCards();
 					player.turnOn();
 
 					if (getScore(player.openCards()) > 21) {
-						System.out.println("BUST! " + player.getName() + "님의 카드의 합이 21점이 넘었습니다.");
-						break;
+						int score = getScore(player.openCards());
+						System.out.println("BUST!");
+						System.out.println(player.getName() + "님의 카드의 합은 " + score + "점으로 21점이 넘었습니다.\n");
+						return players;
+
 					} else if (getScore(player.openCards()) == 21) {
-						System.out.println("BLACK JACK!!! 축하합니다 " + player.getName() + "님의 승리입니다.");
+						System.out.println("BLACK JACK!!!");
+						System.out.println("축하합니다. " + player.getName() + "님의 승리입니다.\n");
 						return players;
 					}
 					continue;
@@ -85,7 +112,7 @@ public class Game {
 	private List<Player> initPhase(CardDeck cardDeck, List<Player> players) {
 		Card card;
 
-		System.out.println("처음 2장의 카드를 뽑겠습니다.");
+		System.out.println("그럼, 각자 처음 2장의 카드를 뽑겠습니다.\n");
 		for (int i = 0; i < INIT_RECEIVE_CARD_COUNT; i++) {
 			for (Player player : players) {
 				card = cardDeck.draw();
@@ -94,6 +121,9 @@ public class Game {
 		}
 
 		for (Player player : players) {
+			if (player instanceof Dealer) {
+				System.out.println("test");
+			}
 			player.showCards();
 		}
 		return players;
@@ -119,16 +149,18 @@ public class Game {
 
 		while (true) {
 			// hit or stay 물어보기
-			System.out.println("1.HIT or 2.STAY?");
+			System.out.print("1.HIT or 2.STAY? : ");
+
 			playerInput = sc.nextLine();
+			System.out.println();
 
 			if (!(playerInput.equals("1") || playerInput.equals("2"))) {
-				System.out.println("잘못입력했습니다.");
+				System.out.println("잘못입력했습니다. 숫자 1과 2만 입력가능합니다.");
 				continue;
 			}
 			break;
 		}
 		return !STOP_RECEIVE_CARD.equals(playerInput);
-//		return !STOP_RECEIVE_CARD.equals(sc.nextLine());
 	}
+
 }

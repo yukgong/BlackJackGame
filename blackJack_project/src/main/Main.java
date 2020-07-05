@@ -1,7 +1,5 @@
 package main;
 
-import java.util.ArrayList;
-
 import gameObject.*;
 
 public class Main {

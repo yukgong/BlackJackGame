@@ -63,7 +63,7 @@ public class Card {
 
 	@Override
 	public String toString() {
-		return "Card [pattern=" + pattern + ", cardNum=" + cardNum + "]";
+		return "| Card = "+ cardNum + ", " + pattern + "\t\t\t  |";
 	}
 
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CardDeck {
 	private static final int CARD_COUNT = 13; // 카드 한 묶음의 갯수
-	private static final String[] PATTERNS = { "스페이드", "하트", "다이아몬드", "클로버" }; // 카드모양
+	private static final String[] PATTERNS = { "♤️", "♡️", "♢️", "♧️" }; // 카드모양
 
 	private List<Card> cards;
 
