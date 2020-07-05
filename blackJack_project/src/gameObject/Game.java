@@ -13,23 +13,30 @@ public class Game {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("+---------BlackJack Game---------+\n");
 		System.out.println("블랙잭은 딜러와 플레이어중 카드의 합이 21 또는");
-		System.out.println("그에 준하는 숫자를 가지는 쪽이 이기는 게임입니다.\n");
+		System.out.println("21에 가까운 숫자를 가지는 쪽이 이기는 게임입니다.\n");
 		GameRule rule = new GameRule();
 		CardDeck cardDeck = new CardDeck();
 
-		// 게임 플레이시
+		// 게임 플레이에 사용할 메소드 호출
 		List<Player> players = Arrays.asList(new Gamer("Gamer"), new Dealer());
 		List<Player> initAfterPlayers = initPhase(cardDeck, players);
-		List<Player> playingAfterPlayers = receiveCardAllPlayers(sc, cardDeck, initAfterPlayers);
+		List<Player> playingAfterPlayers = receiveCardAllPlayers(sc, cardDeck,
+				initAfterPlayers);
 
+		// 결과 출력
 		Player winner = rule.getWinner(playingAfterPlayers);
 		System.out.println("===================================");
-		System.out.println("Winner : " + winner.getName());
+		try {
+			System.out.println("Winner : " + winner.getName());
+		} catch (Exception e) {
+			System.out.println("Winner : 무승부");
+		}
 		System.out.println("===================================");
 	}
 
-	// Player면 hit시 카드를 한장 뽑고 카드 연산하기
-	private List<Player> receiveCardAllPlayers(Scanner sc, CardDeck cardDeck, List<Player> players) {
+	// 카드를 받는 메소드
+	private List<Player> receiveCardAllPlayers(Scanner sc, CardDeck cardDeck,
+			List<Player> players) {
 		boolean playtrue[] = new boolean[2];
 
 		for (int i = 0; i < playtrue.length; i++) {
@@ -42,14 +49,20 @@ public class Game {
 
 			while (true) {
 				System.out.println(player.getName() + "님 차례입니다.");
+				Card card;
 
+				// Dealer면 카드의 총합을 계산해 자동으로 Hit or Stay
 				if (player instanceof Dealer) {
-					Card card = cardDeck.draw();
-					if (getScore(player.openCards()) > 17) {
-						System.out.println("카드의 총 합이 17이 넘습니다. 더이상 카드를 받을 수 없습니다.");
-						player.showCards();
+
+					// 점수가 17 이상일 때
+					if (getScore(player.openCards()) >= 17) {
+						System.out.println("카드의 총 합이 17이 넘습니다. 더이상 카드를 받을 수 없습니다.\n");
+						player.turnOn();
 						break;
-					} else if (getScore(player.openCards()) < 17) {
+					}
+					// 점수가 17 미만일 때
+					else if (getScore(player.openCards()) < 17) {
+						card = cardDeck.draw();
 						System.out.println("카드의 총 합이 17이 넘지 않아 새로운 카드를 뽑습니다.\n");
 						player.receiveCard(card);
 						player.showCards();
@@ -58,21 +71,23 @@ public class Game {
 						if (getScore(player.openCards()) > 21) {
 							int score = getScore(player.openCards());
 							System.out.println("BUST!");
-							System.out.println(player.getName() + "님의 카드의 합은 " + score + "점으로 21점이 넘었습니다.\n");
+							System.out.println(player.getName() + "님의 카드의 합은 " + score
+									+ "점으로 21점이 넘었습니다.\n");
 							return players;
 
 						} else if (getScore(player.openCards()) == 21) {
 							System.out.println("BLACK JACK!!!");
-							System.out.println("축하합니다. " + player.getName() + "님의 승리입니다.\n");
+							System.out.println(
+									"축하합니다. " + player.getName() + "님의 승리입니다.\n");
 							return players;
 						}
 						continue;
 					}
 				}
 
-				// hit면 카드를 한장 뽑기
+				// Player면 hit시 카드를 한장 뽑고 카드 연산하기
 				if (player instanceof Gamer && isReceiveCard(sc)) {
-					Card card = cardDeck.draw();
+					card = cardDeck.draw();
 					player.receiveCard(card);
 					player.showCards();
 					player.turnOn();
@@ -80,7 +95,8 @@ public class Game {
 					if (getScore(player.openCards()) > 21) {
 						int score = getScore(player.openCards());
 						System.out.println("BUST!");
-						System.out.println(player.getName() + "님의 카드의 합은 " + score + "점으로 21점이 넘었습니다.\n");
+						System.out.println(player.getName() + "님의 카드의 합은 " + score
+								+ "점으로 21점이 넘었습니다.\n");
 						return players;
 
 					} else if (getScore(player.openCards()) == 21) {
@@ -120,16 +136,18 @@ public class Game {
 			}
 		}
 
+		// 처음 받은 카드가 2장이 된 후 출력
 		for (Player player : players) {
 			if (player instanceof Dealer) {
-				System.out.println("test");
 			}
 			player.showCards();
 		}
+
 		return players;
 	}
 
-	// Method for Method ---------------------------------------------
+	// Method for Method
+	// ---------------------------------------------
 
 	// 점수 확인
 	public int getScore(List<Card> cards) {

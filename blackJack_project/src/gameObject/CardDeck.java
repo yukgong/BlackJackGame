@@ -20,7 +20,7 @@ public class CardDeck {
 	}
 	
 	// 카드 리스트 생성
-	private List<Card> generateCards(){
+	public List<Card> generateCards(){
 		List<Card> cards = new LinkedList<>();
 
 		// 카드의 무늬와, 끗수, 점수 생성
@@ -41,7 +41,7 @@ public class CardDeck {
 		return selectedCard;
 	}
 	
-	private Card getRandomCard() {
+	public Card getRandomCard() {
 		int size = cards.size();
 		int select = (int)(Math.random()*size);
 		return cards.get(select);

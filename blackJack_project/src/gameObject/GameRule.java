@@ -22,7 +22,7 @@ public class GameRule {
 	public Player getWinner(List<Player> players) {
 		Player winner = null;
 		int winnerScore = 0;
-
+		
 		for (int i = 0; i < players.size()-1; i++) {
 			for (int j = i + 1; j < players.size(); j++) {
 				int gamerScore = getScore(players.get(i).openCards());
